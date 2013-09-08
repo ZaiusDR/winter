@@ -82,7 +82,7 @@ class HostEditLayoutObject(Gtk.Box):
         # Add Widgets to Basic Box
         basic_box.pack_start(server_form, True, True, 0)
         basic_box.pack_start(username_form, True, True, 0)
-        #basic_box.pack_start(password_form, True, True, 0)
+        basic_box.pack_start(password_form, True, True, 0)
         basic_box.pack_start(resol_form, True, True, 0)
         basic_box.pack_start(color_form, True, True, 0)
 
@@ -115,3 +115,17 @@ class HostEditLayoutObject(Gtk.Box):
 
         # Finally add Notebook to Box
         self.pack_start(edit_notebook, True, True, 10)
+        
+class FolderEditLayoutObject(Gtk.Box):
+    def __init__(self, host_info):
+        Gtk.Box.__init__(self)
+        self.set_orientation(Gtk.Orientation.VERTICAL)
+        self.set_spacing(5)
+
+        # Folder Name Entry
+        folder_name_label = Gtk.Label("Folder Name")
+        folder_name_entry = Gtk.Entry()
+        if host_info["ObjectName"]:
+            folder_name_entry.set_text(host_info["ObjectName"])
+        folder_name_form = FormField(folder_name_label, folder_name_entry)
+        self.pack_start(folder_name_form, True, True, 5)

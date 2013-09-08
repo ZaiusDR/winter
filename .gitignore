@@ -33,3 +33,4 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+/pending_features.txt

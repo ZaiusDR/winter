@@ -6,12 +6,13 @@ Created on Sep 6, 2013
 from gi.repository import Gtk, GdkPixbuf, Gdk
 
 # Set Python Path to Custom Modules
-import sys, subprocess
+#import sys
+import subprocess
 
-sys.path.append('/home/eduardo/workspace/Winter/lib/')
+#sys.path.append('/home/eduardo/workspace/Winter/lib/')
 
 # Import Custom Modules
-from widgets.forms import HostEditLayoutObject
+from widgets.forms import HostEditLayoutObject, FolderEditLayoutObject
 from widgets.tablabels import TabLabelCloseButton
 
 
@@ -60,7 +61,7 @@ class ConnectionsTreeStore(Gtk.TreeStore):
 
 
 class ConnectionsTreeView(Gtk.TreeView):
-    def __init__(self, main_window, tree_store, tree_structure):
+    def __init__(self, main_window, tree_store, tree_structure, popup_menu):
         Gtk.TreeView.__init__(self, tree_store)
         
         #Create Tree View and Columns Text and Icons
@@ -79,15 +80,14 @@ class ConnectionsTreeView(Gtk.TreeView):
         self.column.add_attribute(self.renderer_text, 'text', COL_STRING)
 
         self.connect("row-activated", self.on_activate_row, main_window)
-        self.connect("button-press-event", self.on_tree_right_mouse)
+        self.connect("button-press-event", self.on_tree_right_mouse, popup_menu)
         
 
         self.show_all()
 
     def on_activate_row(self, tree_view, path, column, main_window):
-        print(self.selected_host)
-        print(main_window)
-        self.tab_label = TabLabelCloseButton(self.selected_host["ObjectName"], Gtk.STOCK_NETWORK)
+        print(main_window.selected_host)
+        self.tab_label = TabLabelCloseButton(main_window.selected_host["ObjectName"], Gtk.STOCK_NETWORK)
         self.tab_label.connect("close-clicked", main_window.on_tab_close_clicked, main_window.desktop_notebook, main_window.desktop_notebook.get_current_page())
 
         self.socket_id = main_window.desktop_notebook.add_tab(self.tab_label)
@@ -97,11 +97,11 @@ class ConnectionsTreeView(Gtk.TreeView):
         
         desktop_process = [
             "xfreerdp", "-g", str(self.resolution.width) + "x" + str(self.resolution.height), 
-            "-u", self.selected_host["CredentialUsername"],
-            "-p", self.selected_host["Password"],
+            "-u", main_window.selected_host["CredentialUsername"],
+            "-p", main_window.selected_host["Password"],
             "-X", self.socket_id,
             "--ignore-certificate",
-            self.selected_host["PhysicalAddress"]]
+            main_window.selected_host["PhysicalAddress"]]
 
         print(desktop_process)
 
@@ -113,39 +113,64 @@ class ConnectionsTreeView(Gtk.TreeView):
         # print(str(self.widget_size.width) + "x" + str(self.widget_size.height))
         subprocess.Popen(desktop_process)
 
-    def on_tree_right_mouse(self, widget, event):
+    def on_tree_right_mouse(self, widget, event, popup_menu):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             path_tuple = widget.get_path_at_pos(int(event.x), int(event.y))
-            print(path_tuple)
             widget.set_cursor(path_tuple[0], path_tuple[1], False)            
-            self.popup_menu.popup(None, None, None, None, event.button, event.time)
+            popup_menu.popup(None, None, None, None, event.button, event.time)
             return True
         return False
 
     def open_host_edition(self, widget):
-        # Define Window
-        host_edit_win = Gtk.Dialog("Connection Properties", widget, (Gtk.DialogFlags.MODAL),
-            (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-             Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        host_edit_win.set_size_request(400,300)
+        print(widget.selected_host)
+        if widget.selected_host["ObjectType"] == "RoyalFolder":
+            folder_edit_win = Gtk.Dialog("Folder Properties", widget, (Gtk.DialogFlags.MODAL),
+                (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+            folder_edit_win.set_size_request(300,100)
+            
+            folder_edit_box = folder_edit_win.get_content_area()
+            
+            layout = FolderEditLayoutObject(widget.selected_host)
+            folder_edit_box.add(layout)
+            
+            folder_edit_win.show_all()
+            
+            response = folder_edit_win.run()
 
-        # Dialog Box sets a default Box container
-        # Get access to this Box
-        host_edit_box = host_edit_win.get_content_area()
-
-        # Add Form Fileds to Box
-        layout = HostEditLayoutObject(self.selected_host)
-        host_edit_box.add(layout)
-
-        # Show all widgets
-        host_edit_win.show_all()
-
-        # Get and process Response
-        response = host_edit_win.run()
-
-        if response == Gtk.ResponseType.OK:
-            print("Pressed OK")
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Pressend CANCEL")
-
-        host_edit_win.destroy()
+            if response == Gtk.ResponseType.OK:
+                print("Pressed OK")
+            elif response == Gtk.ResponseType.CANCEL:
+                print("Pressend CANCEL")
+                folder_edit_win.destroy()
+    
+            folder_edit_win.destroy()
+            
+        else:    
+            # Define Window
+            host_edit_win = Gtk.Dialog("Connection Properties", widget, (Gtk.DialogFlags.MODAL),
+                (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+            host_edit_win.set_size_request(400,300)
+    
+            # Dialog Box sets a default Box container
+            # Get access to this Box
+            host_edit_box = host_edit_win.get_content_area()
+    
+            # Add Form Fileds to Box
+            layout = HostEditLayoutObject(widget.selected_host)
+            host_edit_box.add(layout)
+    
+            # Show all widgets
+            host_edit_win.show_all()
+    
+            # Get and process Response
+            response = host_edit_win.run()
+    
+            if response == Gtk.ResponseType.OK:
+                print("Pressed OK")
+            elif response == Gtk.ResponseType.CANCEL:
+                print("Pressend CANCEL")
+                host_edit_win.destroy()
+    
+            host_edit_win.destroy()

@@ -95,6 +95,7 @@ class MainUIManager(Gtk.UIManager):
             wtm_file = dialog.get_filename()
             tree_structure = self.parse_wtm(wtm_file)
             conn_tree.create_storage_tree(tree_structure)
+            main_window.tree_structure = tree_structure
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
 
