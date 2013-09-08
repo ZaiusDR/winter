@@ -13,20 +13,28 @@ sys.path.append('/home/eduardo/workspace/Winter/lib/')
 # Import Custom Modules
 from widgets.filechoosers import OpenFileWtmChooser
 from widgets.assistants import ImportAssistant
+from widgets.dialogs import NewFileDialog
 
 class MainUIManager(Gtk.UIManager):
 
     def __init__(self, main_window):
         Gtk.UIManager.__init__(self)
 
-        #Create an Action Group
+        # Create an Action Group
         self.action_group = Gtk.ActionGroup("my_actions")
         
-        #Create an Action For File Menu
+        # Create an Action For File Menu
         self.action_filemenu = Gtk.Action("FileMenu", "File", None, None)
         self.action_group.add_action(self.action_filemenu)
         
-        #Create File Menu Actions
+        # Create File Menu Actions:
+        
+        # New
+        self.action_new = Gtk.Action("FileNew", "_New", "Creates a New File", Gtk.STOCK_NEW)
+        self.action_new.connect("activate", self.on_activate_new, main_window)
+        self.action_group.add_action_with_accel(self.action_new, "<Ctrl>n")
+        
+        # Open
         self.action_open = Gtk.Action("FileOpen", "_Open", "Open Selected File", Gtk.STOCK_OPEN)
         self.action_open.connect("activate", self.on_activate_open, main_window)
         self.action_group.add_action_with_accel(self.action_open, "<Ctrl>o")
@@ -39,10 +47,10 @@ class MainUIManager(Gtk.UIManager):
         self.action_quit.connect("activate", self.quit_program, main_window)
         self.action_group.add_action_with_accel(self.action_quit, None)
         
-        #Create PopUp Menu
+        # Create PopUp Menu
         self.host_popup_menu = Gtk.ActionGroup("HostPopupMenu")
 
-        #Add Actions to Action Group
+        # Add Actions to Action Group
         self.host_popup_menu.add_actions(
             [("HostEdit", Gtk.STOCK_EDIT, "Edit...", None, None, main_window.open_host_edition),
             ("HostDel", Gtk.STOCK_DELETE, "Delete", None)])
@@ -62,7 +70,10 @@ class MainUIManager(Gtk.UIManager):
 
     def on_activate_import_passwords_show_assistant(self, widget, main_window):
         ImportAssistant(main_window)
-    
+        
+    def on_activate_new(self, widget, main_window):
+        NewFileDialog(main_window)
+        
     def on_activate_open(self, widget, main_window):
         
         # Open File Open Chooser custom object

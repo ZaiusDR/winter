@@ -1,6 +1,7 @@
 <ui>
   <menubar name='MenuBar'>
     <menu action='FileMenu'>
+      <menuitem action='FileNew' />
 	  <menuitem action='FileOpen' />
 	  <separator name='Sep1' />
 	  <menuitem action='FileImportPass' />
@@ -9,6 +10,7 @@
 	</menu>
   </menubar>
   <toolbar name='ToolBar'>
+    <toolitem action='FileNew' />
 	<toolitem action='FileOpen' />
   </toolbar>
   <popup name='HostPopupMenu'>
