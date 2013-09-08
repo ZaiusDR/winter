@@ -26,7 +26,6 @@ class ConnectionsTreeStore(Gtk.TreeStore):
         self.file_icon = GdkPixbuf.Pixbuf.new_from_file_at_size("images/File_Icon.png", 15, 15)
 
         # Add default Message
-        print("adding default message to store")
         self.tree_iter = self.append(None, [self.file_icon, tree_structure, ""])
 
 
@@ -61,8 +60,8 @@ class ConnectionsTreeStore(Gtk.TreeStore):
 
 
 class ConnectionsTreeView(Gtk.TreeView):
-    def __init__(self, main_window, tree_store, tree_structure, popup_menu):
-        Gtk.TreeView.__init__(self, tree_store)
+    def __init__(self, main_window):
+        Gtk.TreeView.__init__(self, main_window.conn_tree)
         
         #Create Tree View and Columns Text and Icons
         (COL_PIXBUF, COL_STRING) = range(2)
@@ -80,7 +79,7 @@ class ConnectionsTreeView(Gtk.TreeView):
         self.column.add_attribute(self.renderer_text, 'text', COL_STRING)
 
         self.connect("row-activated", self.on_activate_row, main_window)
-        self.connect("button-press-event", self.on_tree_right_mouse, popup_menu)
+        self.connect("button-press-event", self.on_tree_right_mouse, main_window.popup_menu)
         
 
         self.show_all()
@@ -122,7 +121,8 @@ class ConnectionsTreeView(Gtk.TreeView):
         return False
 
     def open_host_edition(self, widget):
-        print(widget.selected_host)
+        """ Widget is Main Window """
+
         if widget.selected_host["ObjectType"] == "RoyalFolder":
             folder_edit_win = Gtk.Dialog("Folder Properties", widget, (Gtk.DialogFlags.MODAL),
                 (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,

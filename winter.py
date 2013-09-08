@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from gi.repository import Gtk, Unity, Dbusmenu
 import sys
 
 sys.path.append('./src')
@@ -17,8 +18,8 @@ def unity_integration():
     launcher.set_property("quicklist", ql)
 
 
-winter = MainWindow()
 unity_integration()
+winter = MainWindow()
 winter.connect("delete-event", Gtk.main_quit)
 winter.show_all()
 Gtk.main()

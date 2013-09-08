@@ -18,7 +18,7 @@ from widgets.filechoosers import OpenFileChooser, OpenFilePassChooser, SaveFileC
 
 
 class ImportAssistant(Gtk.Assistant):
-    def __init__(self, main_window, tree_structure, conn_tree):
+    def __init__(self, main_window):
         Gtk.Assistant.__init__(self)
 
         #Create Assistant Object with properties
@@ -32,7 +32,7 @@ class ImportAssistant(Gtk.Assistant):
         self.connect("close", self.delete_widget, self)
         """Simulates appply signal"""
         self.get_child().get_children()[1].get_children()[1].get_children()[4].connect(
-            "clicked", self.on_continue_clicked, tree_structure)
+            "clicked", self.on_continue_clicked)
 
         #Add Intro Page
         intro_vbox = Gtk.VBox()
@@ -173,13 +173,13 @@ class ImportAssistant(Gtk.Assistant):
 
         self.connect("prepare", self.validate_pages, path_rtsx_entry,
                         path_csv_entry, path_wtm_entry, label_confirm,
-                        tree_structure, conn_tree)
+                        main_window)
 
         self.show_all()
 
     def validate_pages(self, next_page, box, path_rtsx_entry,
                         path_csv_entry, path_wtm_entry, label_confirm,
-                        tree_structure, conn_tree):
+                        main_window):
 
         page = self.get_current_page()
 
@@ -251,13 +251,25 @@ class ImportAssistant(Gtk.Assistant):
                 label_confirm.set_line_wrap(True)
                 label_confirm.set_alignment(0, .5)
         elif page == 6:
-            tree_structure = self.parse_rtsx_file(tree_structure)
-            tree_structure = self.parse_csv_file(tree_structure)
-            self.save_to_wtm(tree_structure)
+            self.parse_rtsx_file(main_window)
+            self.parse_csv_file(main_window)
+            self.save_to_wtm(main_window)
+            open_file_dialog = Gtk.MessageDialog(self,
+                                        Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                        Gtk.MessageType.QUESTION,
+                                        Gtk.ButtonsType.YES_NO,
+                                        "Import Finished. Do you want to open it now?")
+            response = open_file_dialog.run()
+            
+            if response == Gtk.ResponseType.YES:
+                main_window.uimanager.parse_wtm(self.wtm_file, main_window)
+                main_window.conn_tree.create_storage_tree(main_window.tree_structure)
+            
+            open_file_dialog.destroy()
+            
+    def parse_rtsx_file(self, main_window):
 
-    def parse_rtsx_file(self, tree_structure):
-
-        tree_structure = collections.OrderedDict()
+        main_window.tree_structure = collections.OrderedDict()
         object_id = ''
         get_next_item = False
 
@@ -291,7 +303,7 @@ class ImportAssistant(Gtk.Assistant):
                 # Parse Object Name
                 elif next_item == "Name":
                     object_name = elem.text
-                    tree_structure.update({ object_id : { "ObjectID" : object_id,
+                    main_window.tree_structure.update({ object_id : { "ObjectID" : object_id,
                                                     "ObjectType" : object_type,
                                                     "ObjectName" : object_name }})
                     get_next_item = False
@@ -299,13 +311,13 @@ class ImportAssistant(Gtk.Assistant):
                 elif next_item == "ParentID":
                     object_parent = elem.text
                     get_next_item = False
-                    tree_structure[object_id].update({ "ParentID" : object_parent })
+                    main_window.tree_structure[object_id].update({ "ParentID" : object_parent })
                 # Parse Object IP
                 elif next_item == "URI":
                     if object_type is not "RoyalFolder":
                         object_ip = elem.text
                         get_next_item = False
-                        tree_structure[object_id].update({ "PhysicalAddress" : object_ip })
+                        main_window.tree_structure[object_id].update({ "PhysicalAddress" : object_ip })
                     else:
                         get_next_item = False
                 # Parse Object Username
@@ -315,11 +327,9 @@ class ImportAssistant(Gtk.Assistant):
                     else:
                         object_username = elem.text
                         get_next_item = False
-                        tree_structure[object_id].update({ "CredentialUsername" : object_username })
+                        main_window.tree_structure[object_id].update({ "CredentialUsername" : object_username })
 
-        return tree_structure
-
-    def parse_csv_file(self, tree_structure):
+    def parse_csv_file(self, main_window):
         
         self.label_progress2.set_text("Importing Passwords...")
         self.progress_bar.set_fraction(0.33)
@@ -333,16 +343,14 @@ class ImportAssistant(Gtk.Assistant):
         for line in f.readlines():
             passwords.update({ line.split(",")[0].split('"')[1] : line.split(",")[36].split('"')[1] } )
 
-        for k in tree_structure:
-            if tree_structure[k]["ObjectType"] == "RoyalRDSConnection":
-                if tree_structure[k]["ObjectName"] in passwords:
-                    tree_structure[k].update({ "Password" : passwords[tree_structure[k]["ObjectName"]] })
+        for k in main_window.tree_structure:
+            if main_window.tree_structure[k]["ObjectType"] == "RoyalRDSConnection":
+                if main_window.tree_structure[k]["ObjectName"] in passwords:
+                    main_window.tree_structure[k].update({ "Password" : passwords[main_window.tree_structure[k]["ObjectName"]] })
 
         f.close()
 
-        return tree_structure
-
-    def save_to_wtm(self, tree_structure):
+    def save_to_wtm(self, main_window):
 
         self.label_progress2.set_text("Saving Data...")
         self.progress_bar.set_fraction(0.66)
@@ -351,20 +359,20 @@ class ImportAssistant(Gtk.Assistant):
             
         # Get XML Tree Root Element
         root = ET.Element("wtm_file")
-        for k in tree_structure:
-            if tree_structure[k]["ObjectType"] == "RoyalDocument":
+        for k in main_window.tree_structure:
+            if main_window.tree_structure[k]["ObjectType"] == "RoyalDocument":
                 element = ET.SubElement(root, "winter_object")
-                for attr in tree_structure[k]:
-                    element.set(attr, tree_structure[k][attr])
+                for attr in main_window.tree_structure[k]:
+                    element.set(attr, main_window.tree_structure[k][attr])
                         
             else:
-                if root.find(".//winter_object[@ObjectID='" + tree_structure[k]["ParentID"] + "']") is not None:
-                    parent = root.find(".//winter_object[@ObjectID='" + tree_structure[k]["ParentID"] + "']")
+                if root.find(".//winter_object[@ObjectID='" + main_window.tree_structure[k]["ParentID"] + "']") is not None:
+                    parent = root.find(".//winter_object[@ObjectID='" + main_window.tree_structure[k]["ParentID"] + "']")
                     element = ET.SubElement(parent, "winter_object")
-                    for attr in tree_structure[k]:
-                        if not tree_structure[k][attr]:
-                            tree_structure[k][attr] = ""
-                        element.set(attr, tree_structure[k][attr])
+                    for attr in main_window.tree_structure[k]:
+                        if not main_window.tree_structure[k][attr]:
+                            main_window.tree_structure[k][attr] = ""
+                        element.set(attr, main_window.tree_structure[k][attr])
                         
         result = ET.tostring(root)
         result = result.decode("us-ascii")
@@ -437,7 +445,7 @@ class ImportAssistant(Gtk.Assistant):
     def delete_widget(self, widget, event):
         widget.destroy()
 
-    def on_continue_clicked(self, button, tree_structure):
+    def on_continue_clicked(self, button):
         page = self.get_current_page()
         #print("apply emited")
         if page == 5:
@@ -445,10 +453,4 @@ class ImportAssistant(Gtk.Assistant):
             self.set_current_page(5)
             while Gtk.events_pending():
                 Gtk.main_iteration_do(self)
-            #self.set_current_page(5)
             self.set_current_page(6)
-            #time.sleep(10)
-        elif page == 6:
-            print("Importing mierdas")
-            #self.parse_rtsx_file(tree_structure)
-        #print(page)

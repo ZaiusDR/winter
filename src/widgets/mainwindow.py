@@ -6,7 +6,7 @@ Created on Sep 8, 2013
 #!/usr/bin/python3
 
 # Import GI Modules
-from gi.repository import Gtk, Unity, Dbusmenu
+from gi.repository import Gtk
 
 # Set Python Path to Custom Modules
 import sys
@@ -42,10 +42,9 @@ class MainWindow(Gtk.Window):
         self.conn_tree = ConnectionsTreeStore(self.tree_structure)
 
         #Add Menu bar and Tool Bar to Main Grid
-        self.uimanager = MainUIManager(self.conn_tree, self,
-                                         self.tree_structure)
+        self.uimanager = MainUIManager(self)
 
-        #uimanager = self.draw_menu_bar()
+
         self.menu = self.uimanager.get_widget("/MenuBar")
         main_box.pack_start(self.menu, False, False, 0)
 
@@ -60,13 +59,14 @@ class MainWindow(Gtk.Window):
         main_box.pack_end(main_panel, True, True, 0)
 
         #Add Tree View to Main Panel
-        self.tree_scrolled_win = Gtk.ScrolledWindow()
-        self.tree_scrolled_win.set_size_request(250, -1)
+        tree_scrolled_win = Gtk.ScrolledWindow()
+        tree_scrolled_win.set_size_request(250, -1)
 
-        self.tree_view = ConnectionsTreeView(self, self.conn_tree, self.tree_structure, self.popup_menu)
-        self.tree_scrolled_win.add(self.tree_view)
+        # Initialize Tree View
+        self.tree_view = ConnectionsTreeView(self)
+        tree_scrolled_win.add(self.tree_view)
 
-        main_panel.add1(self.tree_scrolled_win)
+        main_panel.add1(tree_scrolled_win)
         self.tree_view.connect("cursor-changed", self.get_row_data)
 
         # Add Connections Notebook
@@ -76,7 +76,7 @@ class MainWindow(Gtk.Window):
     def get_row_data(self, tree_view):
         tree_selection = self.tree_view.get_selection()
         model, treeiter = tree_selection.get_selected()
-        model.destroy()
+        len(model)
         value = self.conn_tree.get_value(treeiter, 2)
         
         print(value)
@@ -86,6 +86,12 @@ class MainWindow(Gtk.Window):
             print(self.selected_host)
 
     def open_host_edition(self, widget):
+        """ Since there is a cycle dependency with Pop-up menu and
+            Tree View on UIManager, the UIManager call this function
+            when right click mouse in order to have all initialized 
+            at time of calling the function.
+            (Ugly but it makes the trick :P)"""
+            
         self.tree_view.open_host_edition(self)
 
     def on_tab_close_clicked(self, tab_label, notebook, current_page):
@@ -94,21 +100,3 @@ class MainWindow(Gtk.Window):
         print(self)
         notebook.set_current_page(current_page)
         notebook.remove_page(current_page)
-
-
-def unity_integration():
-    launcher = Unity.LauncherEntry.get_for_desktop_id("winter.desktop")
-    launcher.set_property("urgent", True)
-    ql = Dbusmenu.Menuitem.new()
-    item = Dbusmenu.Menuitem.new()
-    item.property_set(Dbusmenu.MENUITEM_PROP_LABEL, "Item 1")
-    item.property_set_bool(Dbusmenu.MENUITEM_PROP_VISIBLE, True)
-    ql.child_append(item)
-    launcher.set_property("quicklist", ql)
-
-
-win = MainWindow()
-unity_integration()
-win.connect("delete-event", Gtk.main_quit)
-win.show_all()
-Gtk.main()

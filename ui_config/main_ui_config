@@ -1,0 +1,18 @@
+<ui>
+  <menubar name='MenuBar'>
+    <menu action='FileMenu'>
+	  <menuitem action='FileOpen' />
+	  <separator name='Sep1' />
+	  <menuitem action='FileImportPass' />
+	  <separator name='Sep2' />
+	  <menuitem action='FileQuit' />
+	</menu>
+  </menubar>
+  <toolbar name='ToolBar'>
+	<toolitem action='FileOpen' />
+  </toolbar>
+  <popup name='HostPopupMenu'>
+	<menuitem action='HostEdit' />
+	<menuitem action='HostDel' />
+  </popup>
+</ui>
