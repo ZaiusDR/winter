@@ -4,6 +4,7 @@ from gi.repository import Gtk, Unity, Dbusmenu
 import sys
 
 sys.path.append('./src')
+sys.path.append('.')
 
 from widgets.mainwindow import MainWindow
 
