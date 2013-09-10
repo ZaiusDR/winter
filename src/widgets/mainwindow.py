@@ -40,7 +40,10 @@ class MainWindow(Gtk.Window):
 
         # Initialize Connections Tree Store
         self.conn_tree = ConnectionsTreeStore(self.tree_structure)
-
+        
+        # Initialize Desktop Notebook
+        self.desktop_notebook = DesktopNotebook(self)
+        
         #Add Menu bar and Tool Bar to Main Grid
         self.uimanager = MainUIManager(self)
 
@@ -70,7 +73,6 @@ class MainWindow(Gtk.Window):
         self.tree_view.connect("cursor-changed", self.get_row_data)
 
         # Add Connections Notebook
-        self.desktop_notebook = DesktopNotebook()
         main_panel.add2(self.desktop_notebook)
 
     def get_row_data(self, tree_view):
@@ -94,9 +96,10 @@ class MainWindow(Gtk.Window):
             
         self.tree_view.open_host_edition(self)
 
-    def on_tab_close_clicked(self, tab_label, notebook, current_page):
-
-        # Set Current Page and Close It
-        print(self)
-        notebook.set_current_page(current_page)
-        notebook.remove_page(current_page)
+#    def on_tab_close_clicked(self, widget):
+#
+#        # Set Current Page and Close It
+#        print(widget)
+#        print(widget.get_parent())
+#        print(self.desktop_notebook.page_num(widget))
+#        self.desktop_notebook.remove_page(self.desktop_notebook.page_num(widget.get_parent()))

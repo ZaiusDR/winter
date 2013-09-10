@@ -7,7 +7,7 @@ from gi.repository import Gtk, GObject
 
 class TabLabelCloseButton(Gtk.Box):
     __gsignals__ = {
-        "close-clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+        "close-clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ())
     }
     def __init__(self, label_text, stock_icon):
         Gtk.Box.__init__(self)

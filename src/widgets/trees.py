@@ -78,39 +78,12 @@ class ConnectionsTreeView(Gtk.TreeView):
         self.column.pack_start(self.renderer_text, expand=True)
         self.column.add_attribute(self.renderer_text, 'text', COL_STRING)
 
-        self.connect("row-activated", self.on_activate_row, main_window)
+        #self.connect("row-activated", self.on_activate_row, main_window)
+        self.connect("row-activated", main_window.desktop_notebook.add_tab, main_window)
         self.connect("button-press-event", self.on_tree_right_mouse, main_window.popup_menu)
         
 
         self.show_all()
-
-    def on_activate_row(self, tree_view, path, column, main_window):
-        print(main_window.selected_host)
-        self.tab_label = TabLabelCloseButton(main_window.selected_host["ObjectName"], Gtk.STOCK_NETWORK)
-        self.tab_label.connect("close-clicked", main_window.on_tab_close_clicked, main_window.desktop_notebook, main_window.desktop_notebook.get_current_page())
-
-        self.socket_id = main_window.desktop_notebook.add_tab(self.tab_label)
-        self.resolution = main_window.desktop_notebook.get_box_size()
-        print(self.resolution.width, self.resolution.height)
-        print(self.socket_id)
-        
-        desktop_process = [
-            "xfreerdp", "-g", str(self.resolution.width) + "x" + str(self.resolution.height), 
-            "-u", main_window.selected_host["CredentialUsername"],
-            "-p", main_window.selected_host["Password"],
-            "-X", self.socket_id,
-            "--ignore-certificate",
-            main_window.selected_host["PhysicalAddress"]]
-
-        print(desktop_process)
-
-        # desktop_process = [
-        #     "xfreerdp", "-g", str(self.resolution.width) + "x" + str(self.resolution.height), 
-        #     "-u", "Test", "-p", "Sokatira", "-X", self.socket_id, "192.168.1.103" 
-        #     ]
-
-        # print(str(self.widget_size.width) + "x" + str(self.widget_size.height))
-        subprocess.Popen(desktop_process)
 
     def on_tree_right_mouse(self, widget, event, popup_menu):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
