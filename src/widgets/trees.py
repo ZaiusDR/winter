@@ -54,7 +54,7 @@ class ConnectionsTreeStore(Gtk.TreeStore):
                         
                     #if tree_structure[k]["ParentID"] == parent_object_id:
                     self.append(self.tree_iter, (self.conn_icon, tree_structure[k]["ObjectName"], tree_structure[k]["ObjectID"]))
-
+                    
 
 class ConnectionsTreeView(Gtk.TreeView):
     def __init__(self, main_window):
