@@ -6,14 +6,14 @@ Created on Sep 6, 2013
 from gi.repository import Gtk
 
 # Set Python Path to Custom Modules
-import sys
 import collections
 import xml.etree.ElementTree as ET
-sys.path.append('/home/eduardo/workspace/Winter/lib/')
+
 # Import Custom Modules
 from widgets.filechoosers import OpenFileWtmChooser
 from widgets.assistants import ImportAssistant
 from widgets.dialogs import NewFileDialog
+
 
 class MainUIManager(Gtk.UIManager):
 
@@ -98,4 +98,5 @@ class MainUIManager(Gtk.UIManager):
         
         for elem in tree.iter():
             if elem.tag != "wtm_file":
-                main_window.tree_structure.update({ elem.attrib["ObjectID"] : elem.attrib })
+                main_window.tree_structure[elem.attrib["ObjectID"]] = elem.attrib
+

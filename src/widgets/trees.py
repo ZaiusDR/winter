@@ -5,15 +5,8 @@ Created on Sep 6, 2013
 '''
 from gi.repository import Gtk, GdkPixbuf, Gdk
 
-# Set Python Path to Custom Modules
-#import sys
-import subprocess
-
-#sys.path.append('/home/eduardo/workspace/Winter/lib/')
-
 # Import Custom Modules
 from widgets.forms import HostEditLayoutObject, FolderEditLayoutObject
-from widgets.tablabels import TabLabelCloseButton
 
 
 class ConnectionsTreeStore(Gtk.TreeStore):
@@ -55,8 +48,12 @@ class ConnectionsTreeStore(Gtk.TreeStore):
                     parent_object_id = tree_structure[k]["ObjectID"]
                 # If Object is RDP Conn, just Add it
                 elif tree_structure[k]["ObjectType"] == "RoyalRDSConnection":
-                    if tree_structure[k]["ParentID"] == parent_object_id:
-                        self.append(self.tree_iter, (self.conn_icon, tree_structure[k]["ObjectName"], tree_structure[k]["ObjectID"]))
+                    while parent_object_id != tree_structure[k]["ParentID"]:
+                        self.tree_iter = self.iter_parent(self.tree_iter)
+                        parent_object_id = tree_structure[self.get(self.tree_iter, 2)[0]]["ObjectID"]
+                        
+                    #if tree_structure[k]["ParentID"] == parent_object_id:
+                    self.append(self.tree_iter, (self.conn_icon, tree_structure[k]["ObjectName"], tree_structure[k]["ObjectID"]))
 
 
 class ConnectionsTreeView(Gtk.TreeView):

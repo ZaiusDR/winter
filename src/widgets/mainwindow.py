@@ -95,11 +95,3 @@ class MainWindow(Gtk.Window):
             (Ugly but it makes the trick :P)"""
             
         self.tree_view.open_host_edition(self)
-
-#    def on_tab_close_clicked(self, widget):
-#
-#        # Set Current Page and Close It
-#        print(widget)
-#        print(widget.get_parent())
-#        print(self.desktop_notebook.page_num(widget))
-#        self.desktop_notebook.remove_page(self.desktop_notebook.page_num(widget.get_parent()))
