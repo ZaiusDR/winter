@@ -111,7 +111,9 @@ class MainUIManager(Gtk.UIManager):
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
 
-        dialog.destroy()    
+        dialog.destroy()
+        
+        main_window.tree_view.expand_row(Gtk.TreePath("0"), False)    
         
     def parse_wtm(self, wtm_file, main_window):
         
