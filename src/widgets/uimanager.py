@@ -50,23 +50,29 @@ class MainUIManager(Gtk.UIManager):
         main_action_group.add_action_with_accel(action_quit, "<Ctrl>q")
         
         # Create PopUp Menu
-        host_popup_menu = Gtk.ActionGroup("HostPopupMenu")
+        tree_popup_menu = Gtk.ActionGroup("HostPopupMenu")
 
         # Add Actions to PopUp
         # New Menu
-        self.action_popup_new = Gtk.Action("PopupNew", "New", None, None)
-        host_popup_menu.add_action(self.action_popup_new)
+        action_popup_new = Gtk.Action("PopupNew", "New", None, None)
+        tree_popup_menu.add_action(action_popup_new)
         
         # New RDP Connection
-        self.action_popup_new_conn = Gtk.Action("PopupNewConn", "New RDP Connection",
+        action_popup_new_conn = Gtk.Action("PopupNewConn", "New RDP Connection",
                                                  "Creates a New RDP Connection", None)
-        self.action_popup_new_conn.connect("activate", self.on_activate_popup_new_conn, main_window)
-        host_popup_menu.add_action(self.action_popup_new_conn)
+        action_popup_new_conn.connect("activate",
+                                           main_window.tree_view.on_activate_popup_new_conn,
+                                           main_window)
+        tree_popup_menu.add_action(action_popup_new_conn)
         
-        host_popup_menu.add_actions(
-            [("HostEdit", Gtk.STOCK_EDIT, "Edit...", None, None, main_window.open_host_edition),
-            ("HostDel", Gtk.STOCK_DELETE, "Delete", None)])
+        # Edit
+        action_popup_edit = Gtk.Action("HostEdit", "Edit", None, None)
+        action_popup_edit.connect("activate", main_window.tree_view.open_host_edition, main_window)
+        tree_popup_menu.add_action(action_popup_edit)
         
+        action_popup_delete = Gtk.Action("HostDel", "Delete", None, None)
+        action_popup_delete.connect("activate", self.on_delete_element) # To be created
+        tree_popup_menu.add_action(action_popup_delete)
 
         # Throws exception if something went wrong
         self.add_ui_from_file("./ui_config/main_ui_config")
@@ -77,7 +83,10 @@ class MainUIManager(Gtk.UIManager):
         
         # Add Action Groups    
         self.insert_action_group(main_action_group)
-        self.insert_action_group(host_popup_menu)
+        self.insert_action_group(tree_popup_menu)
+        
+    def on_delete_element(self, action):
+        pass
         
     def quit_program(self, action, main_window):
         main_window.destroy()
@@ -102,10 +111,7 @@ class MainUIManager(Gtk.UIManager):
         elif response == Gtk.ResponseType.CANCEL:
             dialog.destroy()
 
-        dialog.destroy()
-        
-    def on_activate_popup_new_conn(self, action, main_window):
-        print("New Connection")
+        dialog.destroy()    
         
     def parse_wtm(self, wtm_file, main_window):
         

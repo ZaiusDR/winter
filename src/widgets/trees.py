@@ -6,7 +6,7 @@ Created on Sep 6, 2013
 from gi.repository import Gtk, GdkPixbuf, Gdk
 
 # Import Custom Modules
-from widgets.forms import HostEditLayoutObject, FolderEditLayoutObject
+from widgets.forms import HostEditDialog, FolderEditDialog
 
 
 class ConnectionsTreeStore(Gtk.TreeStore):
@@ -77,7 +77,7 @@ class ConnectionsTreeView(Gtk.TreeView):
 
         #self.connect("row-activated", self.on_activate_row, main_window)
         self.connect("row-activated", main_window.desktop_notebook.add_tab, main_window)
-        self.connect("button-press-event", self.on_tree_right_mouse, main_window.popup_menu)
+        #self.connect("button-press-event", self.on_tree_right_mouse, main_window.popup_menu)
         
 
         self.show_all()
@@ -90,57 +90,14 @@ class ConnectionsTreeView(Gtk.TreeView):
             return True
         return False
 
-    def open_host_edition(self, widget):
-        """ Widget is Main Window """
-
-        if widget.selected_host["ObjectType"] == "RoyalFolder":
-            folder_edit_win = Gtk.Dialog("Folder Properties", widget, (Gtk.DialogFlags.MODAL),
-                (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
-            folder_edit_win.set_size_request(300,100)
-            
-            folder_edit_box = folder_edit_win.get_content_area()
-            
-            layout = FolderEditLayoutObject(widget.selected_host)
-            folder_edit_box.add(layout)
-            
-            folder_edit_win.show_all()
-            
-            response = folder_edit_win.run()
-
-            if response == Gtk.ResponseType.OK:
-                print("Pressed OK")
-            elif response == Gtk.ResponseType.CANCEL:
-                print("Pressend CANCEL")
-                folder_edit_win.destroy()
-    
-            folder_edit_win.destroy()
-            
+    def open_host_edition(self, widget, main_window):
+        if main_window.selected_host["ObjectType"] == "RoyalFolder":
+            # Show Folder Properties Object
+            FolderEditDialog(main_window)
         else:    
-            # Define Window
-            host_edit_win = Gtk.Dialog("Connection Properties", widget, (Gtk.DialogFlags.MODAL),
-                (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
-            host_edit_win.set_size_request(400,300)
-    
-            # Dialog Box sets a default Box container
-            # Get access to this Box
-            host_edit_box = host_edit_win.get_content_area()
-    
-            # Add Form Fileds to Box
-            layout = HostEditLayoutObject(widget.selected_host)
-            host_edit_box.add(layout)
-    
-            # Show all widgets
-            host_edit_win.show_all()
-    
-            # Get and process Response
-            response = host_edit_win.run()
-    
-            if response == Gtk.ResponseType.OK:
-                print("Pressed OK")
-            elif response == Gtk.ResponseType.CANCEL:
-                print("Pressend CANCEL")
-                host_edit_win.destroy()
-    
-            host_edit_win.destroy()
+            # Show Host Properties Object
+            HostEditDialog(main_window)
+            
+    def on_activate_popup_new_conn(self, action, main_window):
+        # Show Host Properties Object
+        HostEditDialog(main_window)

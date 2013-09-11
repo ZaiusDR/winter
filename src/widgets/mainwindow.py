@@ -8,10 +8,10 @@ Created on Sep 8, 2013
 # Import GI Modules
 from gi.repository import Gtk
 
-# Set Python Path to Custom Modules
-import sys
-
-sys.path.append('.')
+# # Set Python Path to Custom Modules
+# import sys
+# 
+# sys.path.append('.')
 
 # Import Custom Modules
 from widgets.notebooks import DesktopNotebook
@@ -44,10 +44,12 @@ class MainWindow(Gtk.Window):
         # Initialize Desktop Notebook
         self.desktop_notebook = DesktopNotebook(self)
         
+        # Initialize Tree View
+        self.tree_view = ConnectionsTreeView(self)
+        
         #Add Menu bar and Tool Bar to Main Grid
         self.uimanager = MainUIManager(self)
-
-
+        
         self.menu = self.uimanager.get_widget("/MenuBar")
         main_box.pack_start(self.menu, False, False, 0)
 
@@ -66,32 +68,27 @@ class MainWindow(Gtk.Window):
         tree_scrolled_win.set_size_request(250, -1)
 
         # Initialize Tree View
-        self.tree_view = ConnectionsTreeView(self)
+        #self.tree_view = ConnectionsTreeView(self)
         tree_scrolled_win.add(self.tree_view)
 
         main_panel.add1(tree_scrolled_win)
         self.tree_view.connect("cursor-changed", self.get_row_data)
-
+        self.tree_view.connect("button-press-event",
+                               self.tree_view.on_tree_right_mouse,
+                               self.popup_menu)
         # Add Connections Notebook
         main_panel.add2(self.desktop_notebook)
 
     def get_row_data(self, tree_view):
+
         tree_selection = self.tree_view.get_selection()
-        model, treeiter = tree_selection.get_selected()
-        len(model)
-        value = self.conn_tree.get_value(treeiter, 2)
-        
-        print(value)
-
-        if value != self.conn_tree.get_value(self.conn_tree.get_iter_first(), 1):
-            self.selected_host = self.tree_structure[value]
-            print(self.selected_host)
-
-    def open_host_edition(self, widget):
-        """ Since there is a cycle dependency with Pop-up menu and
-            Tree View on UIManager, the UIManager call this function
-            when right click mouse in order to have all initialized 
-            at time of calling the function.
-            (Ugly but it makes the trick :P)"""
+        if tree_selection:
+            model, treeiter = tree_selection.get_selected()
+            len(model)
+            #value = self.conn_tree.get_value(treeiter, 2)
+            value = model.get_value(treeiter, 2)
             
-        self.tree_view.open_host_edition(self)
+            if value:
+                if value != self.conn_tree.get_value(self.conn_tree.get_iter_first(), 1):
+                    self.selected_host = self.tree_structure[value]
+                    print(self.selected_host)

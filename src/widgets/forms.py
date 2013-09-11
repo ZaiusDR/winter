@@ -5,28 +5,32 @@ Created on Sep 6, 2013
 '''
 from gi.repository import Gtk
 
-# Set Python Path to Custom Modules
-import sys
-sys.path.append('/home/eduardo/workspace/Winter/lib/')
-
 # Import Custom Modules
 from widgets.formfields import FormField
 from widgets.tablabels import EditHostTabLabel
 
-class HostEditLayoutObject(Gtk.Box):
-    def __init__(self, host_info):
-        Gtk.Box.__init__(self) # Missing param host data
-        self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.set_spacing(5)
+class HostEditDialog(Gtk.Dialog):
+    def __init__(self, main_window):
+        Gtk.Dialog.__init__(self, "Connection Properties", main_window, (Gtk.DialogFlags.MODAL),
+                (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.set_size_request(400,300)
+        
+        # Dialog Box sets a default Box container
+        # Get access to this Box
+        host_edit_box = self.get_content_area()
+        #Box Properties
+        host_edit_box.set_orientation(Gtk.Orientation.VERTICAL)
+        host_edit_box.set_spacing(5)
 
-        print(host_info)
+        print(main_window.selected_host)
         # Host Name Entry
         host_name_label = Gtk.Label("Host Name")
         host_name_entry = Gtk.Entry()
-        if host_info["ObjectName"]:
-            host_name_entry.set_text(host_info["ObjectName"])
+        if main_window.selected_host["ObjectName"]:
+            host_name_entry.set_text(main_window.selected_host["ObjectName"])
         host_name_form = FormField(host_name_label, host_name_entry)
-        self.pack_start(host_name_form, True, True, 5)
+        host_edit_box.pack_start(host_name_form, True, True, 5)
 
         # Notebook and Config Tabs
         edit_notebook = Gtk.Notebook()
@@ -41,22 +45,22 @@ class HostEditLayoutObject(Gtk.Box):
         # IP Field
         server_label = Gtk.Label("Server")
         server_entry = Gtk.Entry()
-        if host_info["PhysicalAddress"]:
-            server_entry.set_text(host_info["PhysicalAddress"])
+        if main_window.selected_host["PhysicalAddress"]:
+            server_entry.set_text(main_window.selected_host["PhysicalAddress"])
         server_form = FormField(server_label, server_entry)
 
         # Username Field
         username_label = Gtk.Label("User Name")
         username_entry = Gtk.Entry()
-        if host_info["CredentialUsername"]:
-            username_entry.set_text(host_info["CredentialUsername"])
+        if main_window.selected_host["CredentialUsername"]:
+            username_entry.set_text(main_window.selected_host["CredentialUsername"])
         username_form = FormField(username_label, username_entry)
 
         # Password Field
         password_label = Gtk.Label("Password")
         password_entry = Gtk.Entry()
-        if host_info["Password"]:
-            password_entry.set_text(host_info["Password"])
+        if main_window.selected_host["Password"]:
+            password_entry.set_text(main_window.selected_host["Password"])
         password_entry.set_visibility(False)
         password_form = FormField(password_label, password_entry)
 
@@ -114,18 +118,55 @@ class HostEditLayoutObject(Gtk.Box):
         edit_notebook.append_page(advanced_box, advanced_tab_label)
 
         # Finally add Notebook to Box
-        self.pack_start(edit_notebook, True, True, 10)
+        host_edit_box.pack_start(edit_notebook, True, True, 10)
         
-class FolderEditLayoutObject(Gtk.Box):
-    def __init__(self, host_info):
-        Gtk.Box.__init__(self)
-        self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.set_spacing(5)
+        self.show_all()
+
+        # Get and process Response
+        while True:
+            response = self.run()                
+
+            if response == Gtk.ResponseType.APPLY:
+                print("Apply Preset")
+                for k in main_window.selected_host:
+                    print(main_window.selected_host[k])
+            elif response == Gtk.ResponseType.OK:
+                print("Pressed OK")
+                self.destroy()
+            elif response == Gtk.ResponseType.CANCEL:
+                print("Pressend CANCEL")
+                self.destroy()
+                
+        
+class FolderEditDialog(Gtk.Dialog):
+    def __init__(self, main_window):
+        Gtk.Dialog.__init__(self, "Folder Properties", main_window, (Gtk.DialogFlags.MODAL),
+                (Gtk.STOCK_APPLY, Gtk.ResponseType.APPLY, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.set_size_request(300,100)
+        
+        folder_edit_box = self.get_content_area()
+        
+        folder_edit_box.set_orientation(Gtk.Orientation.VERTICAL)
+        folder_edit_box.set_spacing(5)
 
         # Folder Name Entry
         folder_name_label = Gtk.Label("Folder Name")
         folder_name_entry = Gtk.Entry()
-        if host_info["ObjectName"]:
-            folder_name_entry.set_text(host_info["ObjectName"])
+        if main_window.selected_host["ObjectName"]:
+            folder_name_entry.set_text(main_window.selected_host["ObjectName"])
         folder_name_form = FormField(folder_name_label, folder_name_entry)
-        self.pack_start(folder_name_form, True, True, 5)
+        folder_edit_box.pack_start(folder_name_form, True, True, 5)
+        
+        self.show_all()
+
+        
+        response = self.run()
+
+        if response == Gtk.ResponseType.OK:
+            print("Pressed OK")
+        elif response == Gtk.ResponseType.CANCEL:
+            print("Pressend CANCEL")
+            self.destroy()
+
+        self.destroy()
