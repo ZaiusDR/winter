@@ -26,10 +26,10 @@ class HostEditDialog(Gtk.Dialog):
         print(main_window.selected_host)
         # Host Name Entry
         host_name_label = Gtk.Label("Host Name")
-        host_name_entry = Gtk.Entry()
+        self.host_name_entry = Gtk.Entry()
         if main_window.selected_host["ObjectName"]:
-            host_name_entry.set_text(main_window.selected_host["ObjectName"])
-        host_name_form = FormField(host_name_label, host_name_entry)
+            self.host_name_entry.set_text(main_window.selected_host["ObjectName"])
+        host_name_form = FormField(host_name_label, self.host_name_entry)
         host_edit_box.pack_start(host_name_form, True, True, 5)
 
         # Notebook and Config Tabs
@@ -128,16 +128,22 @@ class HostEditDialog(Gtk.Dialog):
 
             if response == Gtk.ResponseType.APPLY:
                 print("Apply Preset")
-                for k in main_window.selected_host:
-                    print(main_window.selected_host[k])
+                self.save_host_info(main_window)
             elif response == Gtk.ResponseType.OK:
                 print("Pressed OK")
                 self.destroy()
+                break
             elif response == Gtk.ResponseType.CANCEL:
                 print("Pressend CANCEL")
                 self.destroy()
-                
-        
+                break
+            
+    def save_host_info(self, main_window):
+        if main_window.selected_host["ObjectName"] != self.host_name_entry.get_text():
+            print("Voy a guardar")
+            main_window.tree_structure[main_window.selected_host["ObjectID"]]["ObjectName"] = self.host_name_entry.get_text()
+            main_window.conn_tree.create_storage_tree(main_window.tree_structure)
+            
 class FolderEditDialog(Gtk.Dialog):
     def __init__(self, main_window):
         Gtk.Dialog.__init__(self, "Folder Properties", main_window, (Gtk.DialogFlags.MODAL),

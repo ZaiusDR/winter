@@ -75,10 +75,7 @@ class ConnectionsTreeView(Gtk.TreeView):
         self.column.pack_start(self.renderer_text, expand=True)
         self.column.add_attribute(self.renderer_text, 'text', COL_STRING)
 
-        #self.connect("row-activated", self.on_activate_row, main_window)
         self.connect("row-activated", main_window.desktop_notebook.add_tab, main_window)
-        #self.connect("button-press-event", self.on_tree_right_mouse, main_window.popup_menu)
-        
 
         self.show_all()
 
