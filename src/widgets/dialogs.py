@@ -3,7 +3,7 @@ Created on Sep 7, 2013
 
 @author: eduardo
 '''
-from gi.repository import Gtk
+from gi.repository import Gtk, GdkPixbuf
 
 import random
 import sys
@@ -60,3 +60,21 @@ class NewFileDialog(Gtk.Dialog):
                     message.run()
     
                     message.destroy()
+                    
+                    
+class WinterAboutDialog(Gtk.AboutDialog):
+    def __init__(self):
+        Gtk.AboutDialog.__init__(self)
+        
+        self.set_program_name("Winter Connection Manager")
+        self.set_version("v0.1 (pre-alpha)")
+        f = open("./LICENSE")
+        winter_license = f.read()
+        self.set_license(winter_license)
+        self.set_comments("This is a pre-release")
+        self.set_authors(["Eduardo Suarez"])
+        self.set_logo(GdkPixbuf.Pixbuf.new_from_file("images/winter_icon.png"))
+        
+        self.run()
+        self.destroy()
+        

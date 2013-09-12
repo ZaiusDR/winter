@@ -13,7 +13,7 @@ from xml.dom import minidom
 # Import Custom Modules
 from widgets.filechoosers import OpenFileWtmChooser, SaveFileChooser
 from widgets.assistants import ImportAssistant
-from widgets.dialogs import NewFileDialog
+from widgets.dialogs import NewFileDialog, WinterAboutDialog
 
 
 class MainUIManager(Gtk.UIManager):
@@ -59,6 +59,15 @@ class MainUIManager(Gtk.UIManager):
         action_quit = Gtk.Action("FileQuit", "_Quit", "Quit Program", Gtk.STOCK_QUIT)
         action_quit.connect("activate", self.quit_program, main_window)
         main_action_group.add_action_with_accel(action_quit, "<Ctrl>q")
+        
+        # Help Menu
+        action_helpmenu = Gtk.Action("HelpMenu", "Help", None, None)
+        main_action_group.add_action(action_helpmenu)
+        
+        # About
+        action_about = Gtk.Action("HelpAbout", "About...", None, Gtk.STOCK_ABOUT)
+        action_about.connect("activate", self.on_activate_about)
+        main_action_group.add_action(action_about)
         
         # Create PopUp Menu
         tree_popup_menu = Gtk.ActionGroup("HostPopupMenu")
@@ -148,6 +157,9 @@ class MainUIManager(Gtk.UIManager):
                 self.save_to_wtm(main_window)
                     
             save_chooser.destroy()
+            
+    def on_activate_about(self, action):
+        WinterAboutDialog() 
     
     def save_to_wtm(self, main_window):
         print("Saving to %s" % main_window.open_file)
