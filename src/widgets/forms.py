@@ -43,26 +43,26 @@ class HostEditDialog(Gtk.Dialog):
         basic_box.set_homogeneous(True)
 
         # IP Field
-        server_label = Gtk.Label("Server")
-        server_entry = Gtk.Entry()
+        server_label = Gtk.Label("Server/IP")
+        self.server_entry = Gtk.Entry()
         if main_window.selected_host["PhysicalAddress"]:
-            server_entry.set_text(main_window.selected_host["PhysicalAddress"])
-        server_form = FormField(server_label, server_entry)
+            self.server_entry.set_text(main_window.selected_host["PhysicalAddress"])
+        server_form = FormField(server_label, self.server_entry)
 
         # Username Field
         username_label = Gtk.Label("User Name")
-        username_entry = Gtk.Entry()
+        self.username_entry = Gtk.Entry()
         if main_window.selected_host["CredentialUsername"]:
-            username_entry.set_text(main_window.selected_host["CredentialUsername"])
-        username_form = FormField(username_label, username_entry)
+            self.username_entry.set_text(main_window.selected_host["CredentialUsername"])
+        username_form = FormField(username_label, self.username_entry)
 
         # Password Field
         password_label = Gtk.Label("Password")
-        password_entry = Gtk.Entry()
+        self.password_entry = Gtk.Entry()
         if main_window.selected_host["Password"]:
-            password_entry.set_text(main_window.selected_host["Password"])
-        password_entry.set_visibility(False)
-        password_form = FormField(password_label, password_entry)
+            self.password_entry.set_text(main_window.selected_host["Password"])
+        self.password_entry.set_visibility(False)
+        password_form = FormField(password_label, self.password_entry)
 
         # Resolution Field
         resol_label = Gtk.Label("Label")
@@ -127,22 +127,32 @@ class HostEditDialog(Gtk.Dialog):
             response = self.run()                
 
             if response == Gtk.ResponseType.APPLY:
-                print("Apply Preset")
                 self.save_host_info(main_window)
             elif response == Gtk.ResponseType.OK:
-                print("Pressed OK")
+                self.save_host_info(main_window)
                 self.destroy()
                 break
             elif response == Gtk.ResponseType.CANCEL:
-                print("Pressend CANCEL")
                 self.destroy()
                 break
             
     def save_host_info(self, main_window):
+        # Server Name
         if main_window.selected_host["ObjectName"] != self.host_name_entry.get_text():
-            print("Voy a guardar")
+            for_each_value = main_window.selected_host["ObjectName"]
+            main_window.conn_tree.foreach(self.for_each_row, for_each_value)
             main_window.tree_structure[main_window.selected_host["ObjectID"]]["ObjectName"] = self.host_name_entry.get_text()
-            main_window.conn_tree.create_storage_tree(main_window.tree_structure)
+        
+        # IP
+        if main_window.selected_host["PhysicalAddress"] != self.server_entry.get_text():
+            main_window.tree_structure[main_window.selected_host["ObjectID"]]["PhysicalAddress"] = self.server_entry.get_text()
+            
+    
+    def for_each_row(self, tree_model, path, tree_iter, value):
+        #print(tree_model.get_value(tree_iter, 1))
+        if tree_model.get_value(tree_iter, 1) == value:
+            tree_model.set_value(tree_iter, 1, self.host_name_entry.get_text())
+            
             
 class FolderEditDialog(Gtk.Dialog):
     def __init__(self, main_window):
@@ -158,21 +168,37 @@ class FolderEditDialog(Gtk.Dialog):
 
         # Folder Name Entry
         folder_name_label = Gtk.Label("Folder Name")
-        folder_name_entry = Gtk.Entry()
+        self.folder_name_entry = Gtk.Entry()
         if main_window.selected_host["ObjectName"]:
-            folder_name_entry.set_text(main_window.selected_host["ObjectName"])
-        folder_name_form = FormField(folder_name_label, folder_name_entry)
+            self.folder_name_entry.set_text(main_window.selected_host["ObjectName"])
+        folder_name_form = FormField(folder_name_label, self.folder_name_entry)
         folder_edit_box.pack_start(folder_name_form, True, True, 5)
         
         self.show_all()
 
-        
-        response = self.run()
+        while True:
+            response = self.run()                
 
-        if response == Gtk.ResponseType.OK:
-            print("Pressed OK")
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Pressend CANCEL")
-            self.destroy()
-
-        self.destroy()
+            if response == Gtk.ResponseType.APPLY:
+                self.save_folder_info(main_window)
+            elif response == Gtk.ResponseType.OK:
+                self.save_folder_info(main_window)
+                self.destroy()
+                break
+            elif response == Gtk.ResponseType.CANCEL:
+                self.destroy()
+                break
+            
+    def save_folder_info(self, main_window):
+        # Server Name
+        if main_window.selected_host["ObjectName"] != self.folder_name_entry.get_text():
+            print("Voy a guardar FolderName")
+            for_each_value = main_window.selected_host["ObjectName"]
+            main_window.conn_tree.foreach(self.for_each_row, for_each_value)
+            main_window.tree_structure[main_window.selected_host["ObjectID"]]["ObjectName"] = self.folder_name_entry.get_text()
+    
+    def for_each_row(self, tree_model, path, tree_iter, value):
+        #print(tree_model.get_value(tree_iter, 1))
+        if tree_model.get_value(tree_iter, 1) == value:
+            print("Setting Value")
+            tree_model.set_value(tree_iter, 1, self.folder_name_entry.get_text())

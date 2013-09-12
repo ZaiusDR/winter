@@ -5,12 +5,13 @@ Created on Sep 6, 2013
 '''
 from gi.repository import Gtk
 
-# Set Python Path to Custom Modules
+import os
 import collections
 import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 # Import Custom Modules
-from widgets.filechoosers import OpenFileWtmChooser
+from widgets.filechoosers import OpenFileWtmChooser, SaveFileChooser
 from widgets.assistants import ImportAssistant
 from widgets.dialogs import NewFileDialog
 
@@ -38,6 +39,16 @@ class MainUIManager(Gtk.UIManager):
         action_open = Gtk.Action("FileOpen", "_Open", "Open Selected File", Gtk.STOCK_OPEN)
         action_open.connect("activate", self.on_activate_open, main_window)
         main_action_group.add_action_with_accel(action_open, "<Ctrl>o")
+        
+        # Save
+        action_save = Gtk.Action("FileSave", "_Save", "Save Selected Opened File", Gtk.STOCK_SAVE)
+        action_save.connect("activate", self.on_activate_save, main_window)
+        main_action_group.add_action_with_accel(action_save, "<Ctrl>s")
+        
+        # Save As
+        action_save_as = Gtk.Action("FileSaveAs", "Save as...", "Save to File", Gtk.STOCK_SAVE_AS)
+        action_save_as.connect("activate", self.on_activate_save_as, main_window)
+        main_action_group.add_action_with_accel(action_save_as, "<Ctrl><Shift>s")
 
         # Import
         action_import = Gtk.Action("FileImport", "_Import", "Import Passwords", Gtk.STOCK_INDENT)
@@ -106,6 +117,7 @@ class MainUIManager(Gtk.UIManager):
         
         if response == Gtk.ResponseType.ACCEPT:
             wtm_file = dialog.get_filename()
+            main_window.open_file = wtm_file
             self.parse_wtm(wtm_file, main_window)
             main_window.conn_tree.create_storage_tree(main_window.tree_structure)
         elif response == Gtk.ResponseType.CANCEL:
@@ -114,7 +126,56 @@ class MainUIManager(Gtk.UIManager):
         dialog.destroy()
         
         main_window.tree_view.expand_row(Gtk.TreePath("0"), False)    
+
+    def on_activate_save(self, action, main_window):
+        if main_window.open_file:
+            self.save_to_wtm(main_window)
+    
+    def on_activate_save_as(self, action, main_window):
+        if main_window.open_file:
+            save_chooser = SaveFileChooser(main_window)
+            save_chooser.set_current_folder(os.environ['HOME'])
         
+            response = save_chooser.run()
+        
+            if response == Gtk.ResponseType.ACCEPT:
+                save_file = save_chooser.get_filename()
+                if not ".wtm" in save_file:
+                    save_file = save_file + ".wtm"
+                if not "/" in save_file:
+                    save_file = os.environ['HOME'] + save_file
+                main_window.open_file = save_file
+                self.save_to_wtm(main_window)
+                    
+            save_chooser.destroy()
+    
+    def save_to_wtm(self, main_window):
+        print("Saving to %s" % main_window.open_file)
+        root = ET.Element("wtm_file")
+        for k in main_window.tree_structure:
+            if main_window.tree_structure[k]["ObjectType"] == "RoyalDocument":
+                element = ET.SubElement(root, "winter_object")
+                for attr in main_window.tree_structure[k]:
+                    element.set(attr, main_window.tree_structure[k][attr])
+                        
+            else:
+                if root.find(".//winter_object[@ObjectID='" + main_window.tree_structure[k]["ParentID"] + "']") is not None:
+                    parent = root.find(".//winter_object[@ObjectID='" + main_window.tree_structure[k]["ParentID"] + "']")
+                    element = ET.SubElement(parent, "winter_object")
+                    for attr in main_window.tree_structure[k]:
+                        if not main_window.tree_structure[k][attr]:
+                            main_window.tree_structure[k][attr] = ""
+                        element.set(attr, main_window.tree_structure[k][attr])
+                        
+        result = ET.tostring(root)
+        result = result.decode("us-ascii")
+        parsed = minidom.parseString(result)
+        pretty = parsed.toprettyxml(indent="  ")
+        
+        f = open(main_window.open_file, "w+")
+        f.write(pretty)
+        f.close()
+    
     def parse_wtm(self, wtm_file, main_window):
         
         main_window.tree_structure = collections.OrderedDict()

@@ -49,7 +49,7 @@ class DesktopNotebook(Gtk.Notebook):
 
         # Create Tab Label And connect Close Button Signal
         tab_label = TabLabelCloseButton(main_window.selected_host["ObjectName"], Gtk.STOCK_NETWORK)
-        tab_label.connect("close-clicked", self.on_tab_close_clicked)
+        tab_label.connect("close-clicked", self.on_tab_close_clicked, main_window)
         
         # Create Socket and add it to the Box
         desktop_socket = Gtk.Socket()
@@ -93,10 +93,20 @@ class DesktopNotebook(Gtk.Notebook):
     def on_plug_removed(self, socket):
         self.remove_page(self.get_current_page())
         
-    def on_tab_close_clicked(self, widget):
+    def on_tab_close_clicked(self, widget, main_window):
         """Search for tab in inventory and close it"""
-        for tab in self.open_tabs:
-            if tab["label"] == widget:
-                self.remove_page(self.open_tabs.index(tab))
-                break
-        self.open_tabs.pop(self.open_tabs.index(tab))
+        confirm_message = Gtk.MessageDialog(main_window,
+                                            Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                            Gtk.MessageType.WARNING,
+                                            Gtk.ButtonsType.OK_CANCEL,
+                                            "Do you really want to disconnect?")
+        
+        response = confirm_message.run()
+        
+        if response == Gtk.ResponseType.OK:
+            for tab in self.open_tabs:
+                if tab["label"] == widget:
+                    self.remove_page(self.open_tabs.index(tab))
+                    break
+            self.open_tabs.pop(self.open_tabs.index(tab))
+        confirm_message.destroy()

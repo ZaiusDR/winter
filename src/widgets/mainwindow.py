@@ -5,13 +5,8 @@ Created on Sep 8, 2013
 '''
 #!/usr/bin/python3
 
-# Import GI Modules
-from gi.repository import Gtk
 
-# # Set Python Path to Custom Modules
-# import sys
-# 
-# sys.path.append('.')
+from gi.repository import Gtk
 
 # Import Custom Modules
 from widgets.notebooks import DesktopNotebook
@@ -31,6 +26,10 @@ class MainWindow(Gtk.Window):
         self.maximize()
 
         self.tree_structure = "No File Selected"
+        
+        # Initialize Open File Attribute
+        # I want to control the file name for Save File
+        self.open_file = None
 
         # Add Main Box
         main_box = Gtk.Box()

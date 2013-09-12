@@ -264,6 +264,8 @@ class ImportAssistant(Gtk.Assistant):
             if response == Gtk.ResponseType.YES:
                 main_window.uimanager.parse_wtm(self.wtm_file, main_window)
                 main_window.conn_tree.create_storage_tree(main_window.tree_structure)
+                main_window.tree_view.expand_row(Gtk.TreePath("0"), False)
+                main_window.open_file = self.wtm_file
             
             open_file_dialog.destroy()
             

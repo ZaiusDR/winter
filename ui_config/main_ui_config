@@ -4,14 +4,21 @@
       <menuitem action='FileNew' />
 	  <menuitem action='FileOpen' />
 	  <separator name='Sep1' />
-	  <menuitem action='FileImport' />
+	  <menuitem action='FileSave' />
+	  <menuitem action='FileSaveAs' />
 	  <separator name='Sep2' />
+	  <menuitem action='FileImport' />
+	  <separator name='Sep3' />
 	  <menuitem action='FileQuit' />
 	</menu>
   </menubar>
   <toolbar name='ToolBar'>
     <toolitem action='FileNew' />
+    <separator name='Sep4' />
 	<toolitem action='FileOpen' />
+	<separator name='Sep5' />
+	<toolitem action='FileSave' />
+	<toolitem action='FileSaveAs' />
   </toolbar>
   <popup name='HostPopupMenu'>
     <menu action='PopupNew'>
