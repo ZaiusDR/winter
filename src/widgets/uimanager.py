@@ -60,6 +60,15 @@ class MainUIManager(Gtk.UIManager):
         action_quit.connect("activate", self.quit_program, main_window)
         main_action_group.add_action_with_accel(action_quit, "<Ctrl>q")
         
+        # Options Menu
+        action_optsmenu = Gtk.Action("OptsMenu", "Options", None, None)
+        main_action_group.add_action(action_optsmenu)
+        
+        # Host Defaults
+        action_opts_default = Gtk.Action("OptsDefaults", "Host Defaults", None, None)
+        action_opts_default.connect("activate", self.on_activate_opts_default, main_window)
+        main_action_group.add_action(action_opts_default)
+        
         # Help Menu
         action_helpmenu = Gtk.Action("HelpMenu", "Help", None, None)
         main_action_group.add_action(action_helpmenu)
@@ -164,6 +173,9 @@ class MainUIManager(Gtk.UIManager):
                 self.save_to_wtm(main_window)
                     
             save_chooser.destroy()
+            
+    def on_activate_opts_default(self, action, main_window):
+        pass
             
     def on_activate_about(self, action):
         WinterAboutDialog() 

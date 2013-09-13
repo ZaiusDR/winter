@@ -11,6 +11,9 @@
 	  <separator name='Sep3' />
 	  <menuitem action='FileQuit' />
 	</menu>
+	<menu action='OptsMenu'>
+	  <menuitem action='OptsDefaults' />
+	</menu>
 	<menu action='HelpMenu'>
 	  <menuitem action='HelpAbout' />
 	</menu>

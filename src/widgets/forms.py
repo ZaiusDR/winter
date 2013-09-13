@@ -294,12 +294,7 @@ class HostNewDialog(Gtk.Dialog):
                                                   "CredentialUsername" : self.username_entry.get_text(),
                                                   "Password" : self.password_entry.get_text(),
                                                   "ParentID" : main_window.selected_host["ObjectID"] }
-    
-    def for_each_row(self, tree_model, path, tree_iter, value):
-        #print(tree_model.get_value(tree_iter, 1))
-        if tree_model.get_value(tree_iter, 1) == value:
-            tree_model.set_value(tree_iter, 1, self.host_name_entry.get_text())
-            
+        
 
 class FolderEditDialog(Gtk.Dialog):
     def __init__(self, main_window):

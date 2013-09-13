@@ -42,6 +42,7 @@ class MainWindow(Gtk.Window):
         
         # Initialize Desktop Notebook
         self.desktop_notebook = DesktopNotebook(self)
+        self.desktop_notebook.set_size_request(800, -1)
         
         # Initialize Tree View
         self.tree_view = ConnectionsTreeView(self)
@@ -64,17 +65,17 @@ class MainWindow(Gtk.Window):
 
         #Add Tree View to Main Panel
         tree_scrolled_win = Gtk.ScrolledWindow()
-        tree_scrolled_win.set_size_request(250, -1)
+        tree_scrolled_win.set_size_request(200, -1)
 
         tree_scrolled_win.add(self.tree_view)
 
-        main_panel.add1(tree_scrolled_win)
+        main_panel.pack1(tree_scrolled_win, True, False)
         self.tree_view.connect("cursor-changed", self.get_row_data)
         self.tree_view.connect("button-press-event",
                                self.tree_view.on_tree_right_mouse,
                                self.popup_menu)
         # Add Connections Notebook
-        main_panel.add2(self.desktop_notebook)
+        main_panel.pack2(self.desktop_notebook, True, False)
         
         # Set Search Properties
         self.tree_view.set_search_column(1)
