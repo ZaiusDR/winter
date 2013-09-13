@@ -66,8 +66,6 @@ class MainWindow(Gtk.Window):
         tree_scrolled_win = Gtk.ScrolledWindow()
         tree_scrolled_win.set_size_request(250, -1)
 
-        # Initialize Tree View
-        #self.tree_view = ConnectionsTreeView(self)
         tree_scrolled_win.add(self.tree_view)
 
         main_panel.add1(tree_scrolled_win)
@@ -77,15 +75,18 @@ class MainWindow(Gtk.Window):
                                self.popup_menu)
         # Add Connections Notebook
         main_panel.add2(self.desktop_notebook)
+        
+        # Set Search Properties
+        self.tree_view.set_search_column(1)
 
     def get_row_data(self, tree_view):
 
         tree_selection = self.tree_view.get_selection()
         if tree_selection:
-            model, treeiter = tree_selection.get_selected()
+            model, self.selected_iter = tree_selection.get_selected()
             len(model)
             #value = self.conn_tree.get_value(treeiter, 2)
-            value = model.get_value(treeiter, 2)
+            value = model.get_value(self.selected_iter, 2)
             
             if value:
                 if value != self.conn_tree.get_value(self.conn_tree.get_iter_first(), 1):

@@ -26,6 +26,7 @@
   <popup name='HostPopupMenu'>
     <menu action='PopupNew'>
       <menuitem action='PopupNewConn' />
+      <menuitem action='PopupNewFolder' />
     </menu>
 	<menuitem action='HostEdit' />
 	<menuitem action='HostDel' />

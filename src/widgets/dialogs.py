@@ -6,9 +6,7 @@ Created on Sep 7, 2013
 from gi.repository import Gtk, GdkPixbuf
 
 import random
-import sys
-
-sys.path.append(".")
+import collections
 
 from widgets.formfields import FormField
 
@@ -41,9 +39,9 @@ class NewFileDialog(Gtk.Dialog):
                 if filename_entry.get_text():
                     main_window.conn_tree.clear()
                     object_id = str(random.randrange(20**15))
-                    main_window.tree_structure = { object_id : { "ObjectID" : object_id,
+                    main_window.tree_structure = collections.OrderedDict({ object_id : { "ObjectID" : object_id,
                                                                 "ObjectType" : "RoyalDocument",
-                                                                "ObjectName" : filename_entry.get_text() } }
+                                                                "ObjectName" : filename_entry.get_text() } })
                                   
                     print(main_window.tree_structure)                
                     main_window.conn_tree.create_storage_tree(main_window.tree_structure)

@@ -6,7 +6,7 @@ Created on Sep 6, 2013
 from gi.repository import Gtk, GdkPixbuf, Gdk
 
 # Import Custom Modules
-from widgets.forms import HostEditDialog, FolderEditDialog
+from widgets.forms import HostEditDialog, HostNewDialog, FolderEditDialog, FolderNewDialog
 
 
 class ConnectionsTreeStore(Gtk.TreeStore):
@@ -78,7 +78,7 @@ class ConnectionsTreeView(Gtk.TreeView):
         self.connect("row-activated", main_window.desktop_notebook.add_tab, main_window)
 
         self.show_all()
-
+        
     def on_tree_right_mouse(self, widget, event, popup_menu):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             path_tuple = widget.get_path_at_pos(int(event.x), int(event.y))
@@ -97,4 +97,8 @@ class ConnectionsTreeView(Gtk.TreeView):
             
     def on_activate_popup_new_conn(self, action, main_window):
         # Show Host Properties Object
-        HostEditDialog(main_window)
+        HostNewDialog(main_window)
+        
+    def on_activate_popup_new_folder(self, action, main_window):
+        # Show Folder Properties Object
+        FolderNewDialog(main_window)
