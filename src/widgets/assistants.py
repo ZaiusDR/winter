@@ -6,13 +6,11 @@ Created on Sep 6, 2013
 from gi.repository import Gtk
 
 # Set Python Path to Custom Modules
-#import sys
 import os
 import collections
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
-#sys.path.append('/home/eduardo/quickly/winter/lib/')
 # Import Custom Modules
 from widgets.filechoosers import OpenFileChooser, OpenFilePassChooser, SaveFileChooser
 

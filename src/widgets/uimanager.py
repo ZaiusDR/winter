@@ -83,16 +83,16 @@ class MainUIManager(Gtk.UIManager):
 
         # Add Actions to PopUp
         # New Menu
-        action_popup_new = Gtk.Action("PopupNew", "New", None, None)
-        tree_popup_menu.add_action(action_popup_new)
+        self.action_popup_new = Gtk.Action("PopupNew", "New", None, None)
+        tree_popup_menu.add_action(self.action_popup_new)
         
         # New RDP Connection
-        action_popup_new_conn = Gtk.Action("PopupNewConn", "New RDP Connection",
+        self.action_popup_new_conn = Gtk.Action("PopupNewConn", "New RDP Connection",
                                                  "Creates a New RDP Connection", None)
-        action_popup_new_conn.connect("activate",
+        self.action_popup_new_conn.connect("activate",
                                        main_window.tree_view.on_activate_popup_new_conn,
                                        main_window)
-        tree_popup_menu.add_action(action_popup_new_conn)
+        tree_popup_menu.add_action(self.action_popup_new_conn)
         
         # New Folder
         action_popup_new_folder = Gtk.Action("PopupNewFolder", "New Folder", None, None)

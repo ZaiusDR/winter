@@ -11,6 +11,7 @@ import random
 from widgets.formfields import FormField
 from widgets.tablabels import EditHostTabLabel
 
+
 class HostEditDialog(Gtk.Dialog):
     def __init__(self, main_window):
         Gtk.Dialog.__init__(self, "Connection Properties", main_window, (Gtk.DialogFlags.MODAL),

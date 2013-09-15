@@ -5,6 +5,7 @@ Created on Sep 6, 2013
 '''
 from gi.repository import Gtk, GObject
 
+
 class TabLabelCloseButton(Gtk.Box):
     __gsignals__ = {
         "close-clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ())

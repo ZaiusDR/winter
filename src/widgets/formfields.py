@@ -5,6 +5,7 @@ Created on Sep 6, 2013
 '''
 from gi.repository import Gtk
 
+
 class FormField(Gtk.Box):
     def __init__(self, label, widget):
         Gtk.Box.__init__(self)

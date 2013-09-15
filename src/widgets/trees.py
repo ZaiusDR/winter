@@ -51,8 +51,6 @@ class ConnectionsTreeStore(Gtk.TreeStore):
                     while parent_object_id != tree_structure[k]["ParentID"]:
                         self.tree_iter = self.iter_parent(self.tree_iter)
                         parent_object_id = tree_structure[self.get(self.tree_iter, 2)[0]]["ObjectID"]
-                        
-                    #if tree_structure[k]["ParentID"] == parent_object_id:
                     self.append(self.tree_iter, (self.conn_icon, tree_structure[k]["ObjectName"], tree_structure[k]["ObjectID"]))
                     
 
@@ -79,11 +77,16 @@ class ConnectionsTreeView(Gtk.TreeView):
 
         self.show_all()
         
-    def on_tree_right_mouse(self, widget, event, popup_menu):
+    def on_tree_right_mouse(self, widget, event, main_window):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             path_tuple = widget.get_path_at_pos(int(event.x), int(event.y))
-            widget.set_cursor(path_tuple[0], path_tuple[1], False)            
-            popup_menu.popup(None, None, None, None, event.button, event.time)
+            widget.set_cursor(path_tuple[0], path_tuple[1], False)
+            # If Clicked a RDP disable New Objects Menu
+            if main_window.selected_host["ObjectType"] == "RoyalRDSConnection":
+                main_window.uimanager.action_popup_new.set_sensitive(False)
+            else:
+                main_window.uimanager.action_popup_new.set_sensitive(True)
+            main_window.popup_menu.popup(None, None, None, None, event.button, event.time)
             return True
         return False
 

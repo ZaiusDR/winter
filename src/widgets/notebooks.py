@@ -74,11 +74,13 @@ class DesktopNotebook(Gtk.Notebook):
         
         # Launch XFreeRDP Subprocess
         desktop_process = [
-            "xfreerdp", "-g", str(self.resolution.width) + "x" + str(self.resolution.height), 
+            "xfreerdp", "-g", str(self.resolution.width) + "x" + str(self.resolution.height),
             "-u", main_window.selected_host["CredentialUsername"],
             "-p", main_window.selected_host["Password"],
             "-X", desktop_socket_id,
             "--ignore-certificate",
+            "--plugin", "cliprdr",
+            "--plugin", "rdpdr", "--data", "disk:HOME:/home/eduardo", "--",
             main_window.selected_host["PhysicalAddress"]]
         
         # Here we go!
@@ -100,6 +102,7 @@ class DesktopNotebook(Gtk.Notebook):
                                             Gtk.MessageType.WARNING,
                                             Gtk.ButtonsType.OK_CANCEL,
                                             "Do you really want to disconnect?")
+        confirm_message.set_title("Disconnecting")
         
         response = confirm_message.run()
         

@@ -3,8 +3,6 @@ Created on Sep 8, 2013
 
 @author: eduardo
 '''
-#!/usr/bin/python3
-
 
 from gi.repository import Gtk
 
@@ -69,16 +67,17 @@ class MainWindow(Gtk.Window):
 
         tree_scrolled_win.add(self.tree_view)
 
-        main_panel.pack1(tree_scrolled_win, True, False)
+        main_panel.add1(tree_scrolled_win)#, True, False)
         self.tree_view.connect("cursor-changed", self.get_row_data)
         self.tree_view.connect("button-press-event",
                                self.tree_view.on_tree_right_mouse,
-                               self.popup_menu)
+                               self)
         # Add Connections Notebook
-        main_panel.pack2(self.desktop_notebook, True, False)
+        main_panel.add2(self.desktop_notebook)#, True, False)
         
         # Set Search Properties
-        self.tree_view.set_search_column(1)
+        self.tree_view.set_enable_search(False)
+        
 
     def get_row_data(self, tree_view):
 
@@ -86,7 +85,6 @@ class MainWindow(Gtk.Window):
         if tree_selection:
             model, self.selected_iter = tree_selection.get_selected()
             len(model)
-            #value = self.conn_tree.get_value(treeiter, 2)
             value = model.get_value(self.selected_iter, 2)
             
             if value:

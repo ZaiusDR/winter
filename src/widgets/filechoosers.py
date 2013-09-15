@@ -1,5 +1,6 @@
 from gi.repository import Gtk
 
+
 class OpenFileWtmChooser(Gtk.FileChooserDialog):
     def __init__(self, parent):
         Gtk.FileChooserDialog.__init__(self, "Please choose a file", parent, 
@@ -21,7 +22,8 @@ class OpenFileWtmChooser(Gtk.FileChooserDialog):
         self.add_filter(filter_any)
 
         self.show_all()
-        
+
+      
 class OpenFileChooser(Gtk.FileChooserDialog):
     def __init__(self, parent):
         Gtk.FileChooserDialog.__init__(self, "Please choose a file", parent, 
