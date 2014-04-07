@@ -74,10 +74,12 @@ class DesktopNotebook(Gtk.Notebook):
         
         # Launch XFreeRDP Subprocess
         desktop_process = [
-            "xfreerdp", "-g", str(self.resolution.width) + "x" + str(self.resolution.height),
+            "xfreerdp",
+            "-g", str(self.resolution.width) + "x" + str(self.resolution.height),
             "-u", main_window.selected_host["CredentialUsername"],
             "-p", main_window.selected_host["Password"],
             "-X", desktop_socket_id,
+            "-a", "24",
             "--ignore-certificate",
             "--plugin", "cliprdr",
             "--plugin", "rdpdr", "--data", "disk:HOME:/home/eduardo", "--",
@@ -85,8 +87,10 @@ class DesktopNotebook(Gtk.Notebook):
         
         # Here we go!
         subprocess.Popen(desktop_process)
+        
+            
 
-        # If RDP Session is 
+        # If RDP Session is Disconnected
         desktop_socket.connect("plug-removed", self.on_plug_removed)
         
     def get_box_size(self):
