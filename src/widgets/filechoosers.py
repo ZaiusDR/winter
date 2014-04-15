@@ -1,4 +1,5 @@
 from gi.repository import Gtk
+from os import getenv
 
 
 class OpenFileWtmChooser(Gtk.FileChooserDialog):
@@ -7,6 +8,7 @@ class OpenFileWtmChooser(Gtk.FileChooserDialog):
                                         Gtk.FileChooserAction.OPEN,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT))
+        self.set_current_folder(getenv("HOME"))
 
     # Add Filters
 

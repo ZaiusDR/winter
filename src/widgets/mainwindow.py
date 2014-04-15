@@ -4,7 +4,7 @@ Created on Sep 8, 2013
 @author: eduardo
 '''
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 # Import Custom Modules
 from widgets.notebooks import DesktopNotebook
@@ -22,6 +22,8 @@ class MainWindow(Gtk.Window):
         self.set_size_request(600, 500)
 
         self.maximize()
+        
+        self.connect("key_press_event", self.on_key_press)
 
         self.tree_structure = "No File Selected"
         
@@ -67,13 +69,15 @@ class MainWindow(Gtk.Window):
 
         tree_scrolled_win.add(self.tree_view)
 
-        main_panel.add1(tree_scrolled_win)#, True, False)
+        main_panel.add1(tree_scrolled_win)
+        #main_panel.pack1(tree_scrolled_win, True, False)
         self.tree_view.connect("cursor-changed", self.get_row_data)
         self.tree_view.connect("button-press-event",
                                self.tree_view.on_tree_right_mouse,
                                self)
         # Add Connections Notebook
         main_panel.add2(self.desktop_notebook)#, True, False)
+        #main_panel.pack2(self.desktop_notebook, True, False)
         
         # Set Search Properties
         self.tree_view.set_enable_search(False)
@@ -91,3 +95,9 @@ class MainWindow(Gtk.Window):
                 if value != self.conn_tree.get_value(self.conn_tree.get_iter_first(), 1):
                     self.selected_host = self.tree_structure[value]
                     print(self.selected_host)
+
+    def on_key_press(self, widget, event):
+        print(Gdk.keyval_name(event.keyval))
+        print(self.desktop_notebook.has_focus())
+        print(self.desktop_notebook.resolution_box.has_focus())
+        print(self.desktop_notebook.desktop_socket.has_focus())

@@ -150,6 +150,13 @@ class HostEditDialog(Gtk.Dialog):
         if main_window.selected_host["PhysicalAddress"] != self.server_entry.get_text():
             main_window.tree_structure[main_window.selected_host["ObjectID"]]["PhysicalAddress"] = self.server_entry.get_text()
             
+        # User Name
+        if main_window.selected_host["CredentialUsername"] != self.username_entry.get_text():
+            main_window.tree_structure[main_window.selected_host["ObjectID"]]["CredentialUsername"] = self.username_entry.get_text()
+            
+        # Password
+        if main_window.selected_host["Password"] != self.password_entry.get_text():
+            main_window.tree_structure[main_window.selected_host["ObjectID"]]["Password"] = self.password_entry.get_text()
     
     def for_each_row(self, tree_model, path, tree_iter, value):
         if tree_model.get_value(tree_iter, 1) == value:
@@ -262,30 +269,34 @@ class HostNewDialog(Gtk.Dialog):
         self.show_all()
 
         # Get and process Response
+        object_id = False
         while True:
             response = self.run()                
 
             if response == Gtk.ResponseType.APPLY:
-                self.save_new_host_info(main_window)
+                object_id = self.save_new_host_info(main_window, object_id)
             elif response == Gtk.ResponseType.OK:
-                self.save_new_host_info(main_window)
+                self.save_new_host_info(main_window, object_id)
                 self.destroy()
                 break
             elif response == Gtk.ResponseType.CANCEL:
                 self.destroy()
                 break
             
-    def save_new_host_info(self, main_window):
-        # Initialize Node Values
-        object_id = str(random.randrange(20**15))
-        conn_icon = GdkPixbuf.Pixbuf.new_from_file_at_size("images/Connection_Icon.png", 15, 15)
-        
-        # Append to Tree and Expand for visibility
-        main_window.conn_tree.append(main_window.selected_iter, (conn_icon, 
-                                                                 self.host_name_entry.get_text(),
-                                                                 object_id))
-        main_window.tree_view.expand_row(main_window.conn_tree.get_path(main_window.selected_iter),
-                                         False)
+    def save_new_host_info(self, main_window, object_id):
+        """Save new host information"""
+        # If no object_id set yet, initialize Node Values
+        print(object_id)
+        if not object_id:
+            object_id = str(random.randrange(20**15))
+            conn_icon = GdkPixbuf.Pixbuf.new_from_file_at_size("images/Connection_Icon.png", 15, 15)
+            
+            # Append to Tree and Expand for visibility
+            main_window.conn_tree.append(main_window.selected_iter, (conn_icon, 
+                                                                     self.host_name_entry.get_text(),
+                                                                     object_id))
+            main_window.tree_view.expand_row(main_window.conn_tree.get_path(main_window.selected_iter),
+                                             False)
         
         # Append to Tree Structure Dict
         main_window.tree_structure[object_id] = { "ObjectType" : "RoyalRDSConnection",
@@ -295,6 +306,8 @@ class HostNewDialog(Gtk.Dialog):
                                                   "CredentialUsername" : self.username_entry.get_text(),
                                                   "Password" : self.password_entry.get_text(),
                                                   "ParentID" : main_window.selected_host["ObjectID"] }
+        print(main_window.tree_structure[object_id])
+        return object_id
         
 
 class FolderEditDialog(Gtk.Dialog):

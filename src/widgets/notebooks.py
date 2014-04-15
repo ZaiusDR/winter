@@ -4,11 +4,10 @@ Created on Sep 6, 2013
 @author: eduardo
 '''
 from gi.repository import Gtk
-import subprocess
 
 # Import Custom Modules
 from widgets.tablabels import TabLabelCloseButton
-
+from freerdp.rdp_launcher import freerdp_plug
 
 class DesktopNotebook(Gtk.Notebook):
     def __init__(self, main_window):
@@ -20,12 +19,12 @@ class DesktopNotebook(Gtk.Notebook):
         self.open_tabs = []
         
         # Add Empty Initial Tab
-        resolution_box = Gtk.Box()
-        self.init_tab = self.append_page(resolution_box, tab_label=Gtk.Label("No connections"))
+        self.resolution_box = Gtk.Box()
+        self.init_tab = self.append_page(self.resolution_box, tab_label=Gtk.Label("No connections"))
         self.show_all()
 
         # Connect Box to continuously get its size stored
-        resolution_box.connect("size-allocate", self.__get_widget_size)
+        self.resolution_box.connect("size-allocate", self.__get_widget_size)
 
     def __get_widget_size(self, widget, size_allocation):
         self.widget_size = widget.get_allocation()
@@ -37,7 +36,7 @@ class DesktopNotebook(Gtk.Notebook):
         
         # Close Default Initial Tab
         if self.init_tab != None:
-            print("Removing")
+            #print("Removing")
             self.remove_page(self.init_tab)
             self.init_tab = None
 
@@ -52,12 +51,12 @@ class DesktopNotebook(Gtk.Notebook):
         tab_label.connect("close-clicked", self.on_tab_close_clicked, main_window)
         
         # Create Socket and add it to the Box
-        desktop_socket = Gtk.Socket()
-        desktop_box.pack_start(desktop_socket, False, False, 0)
+        self.desktop_socket = Gtk.Socket()
+        desktop_box.pack_start(self.desktop_socket, False, False, 0)
         
         # Get Box Resolution
         self.resolution = self.get_box_size()
-        #print(self.resolution.width, self.resolution.height) 
+        print(self.resolution.width, self.resolution.height) 
         
         # Add the page
         tab_id = self.append_page(desktop_box, tab_label)        
@@ -68,30 +67,19 @@ class DesktopNotebook(Gtk.Notebook):
         self.open_tabs.append({ "child" : desktop_box, "label" : tab_label})
         # Connect Box to continuously get its size stored
         desktop_box.connect("size-allocate", self.__get_widget_size)
-
+        #print(self.resolution.width, self.resolution.height)
+        
         # Get Socket ID
-        desktop_socket_id = hex(desktop_socket.get_id())
+        desktop_socket_id = hex(self.desktop_socket.get_id())
         
-        # Launch XFreeRDP Subprocess
-        desktop_process = [
-            "xfreerdp",
-            "-g", str(self.resolution.width) + "x" + str(self.resolution.height),
-            "-u", main_window.selected_host["CredentialUsername"],
-            "-p", main_window.selected_host["Password"],
-            "-X", desktop_socket_id,
-            "-a", "24",
-            "--ignore-certificate",
-            "--plugin", "cliprdr",
-            "--plugin", "rdpdr", "--data", "disk:HOME:/home/eduardo", "--",
-            main_window.selected_host["PhysicalAddress"]]
+        # Create Desktop
+        desktop = freerdp_plug(main_window, desktop_socket_id)
         
-        # Here we go!
-        subprocess.Popen(desktop_process)
+        # Launch Desktop
+        desktop.launch(main_window)
         
-            
-
         # If RDP Session is Disconnected
-        desktop_socket.connect("plug-removed", self.on_plug_removed)
+        self.desktop_socket.connect("plug-removed", self.on_plug_removed)
         
     def get_box_size(self):
         return self.widget_size
