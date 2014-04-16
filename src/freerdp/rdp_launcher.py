@@ -5,7 +5,7 @@ Created on Apr 14, 2014
 '''
 from gi.repository import Gtk, Gdk, GObject
 
-import subprocess, threading, time
+import os
 
 from freerdp.rdp_thread import rdpThread 
 
@@ -19,6 +19,7 @@ class freerdp_plug():
         self.password = main_window.selected_host["Password"]
         self.id = desktop_socket_id
         self.host = main_window.selected_host["PhysicalAddress"]
+        self.disk_home = "disk:HOME:%s" % os.getenv("HOME")
         
     def launch(self, main_window):
 
@@ -32,7 +33,7 @@ class freerdp_plug():
             "-a", "24",
             "--ignore-certificate",
             "--plugin", "cliprdr",
-            "--plugin", "rdpdr", "--data", "disk:HOME:/home/eduardo", "--",
+            "--plugin", "rdpdr", "--data", self.disk_home, "--",
             self.host]
         
         desktop_thread = rdpThread(main_window, desktop_process)
