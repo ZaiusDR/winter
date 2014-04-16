@@ -11,17 +11,25 @@ class rdpThread(threading.Thread):
         threading.Thread.__init__(self, name="Thread1")
         self.desktop_process = desktop_process
         self.main_window = main_window
-        self.quit = False
-        print("All init on rdp Thread")
+        print(desktop_process)
          
     def show_error(self, process_output):
         if process_output:
-            print("He recibido algo")
+            print(process_output)
+            for line in process_output:
+                line = str(line, encoding='utf8')
+                if "Failed to check xfreerdp file descriptor" in line:
+                    error_message = "You have been disconected from %s" % self.desktop_process[len(self.desktop_process) - 1]
+                elif "0x00000005" in line:
+                    error_message = "Another user connected to the server, forcing the disconnection of the current connection."
+                elif "unable to connect" in line:
+                    error_message = line
+
             message=Gtk.MessageDialog(self.main_window,
                                     Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR,
                                     Gtk.ButtonsType.OK,
-                                    process_output)
+                                    error_message)
             message.set_size_request(50, 100)
             message.set_title("Error")
             message.run()
@@ -29,11 +37,8 @@ class rdpThread(threading.Thread):
             message.destroy()
      
     def run(self):
-        print("start process")
         p = subprocess.Popen(self.desktop_process, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print("start Waiting")
         p.wait()
-        print("Process Died")
-        #self.show_error(p.stdout.readlines())
+        # I really don't know how it works but it works :D
         GObject.idle_add(self.show_error, p.stdout.readlines())
         time.sleep(0.1)
