@@ -3,8 +3,6 @@ Created on Apr 14, 2014
 
 @author: eduardo
 '''
-from gi.repository import Gtk, Gdk, GObject
-
 import os
 
 from freerdp.rdp_thread import rdpThread 
