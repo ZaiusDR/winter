@@ -35,6 +35,7 @@ class rdpThread(threading.Thread):
             message.run()
             
             message.destroy()
+            return False
      
     def run(self):
         p = subprocess.Popen(self.desktop_process, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
