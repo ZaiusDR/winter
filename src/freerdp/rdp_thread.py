@@ -24,6 +24,8 @@ class rdpThread(threading.Thread):
                     error_message = "Another user connected to the server, forcing the disconnection of the current connection."
                 elif "unable to connect" in line:
                     error_message = line
+                elif "Authentication failure" in line:
+                    error_message = line
 
             message=Gtk.MessageDialog(self.main_window,
                                     Gtk.DialogFlags.DESTROY_WITH_PARENT,
